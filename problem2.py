@@ -89,11 +89,10 @@ def process_spark_data(spark, s3_path):
 
 def save_csv(df, temp_name, final_name):
     """Save DataFrame to CSV with proper naming."""
-    df.coalesce(1).write.mode('overwrite').csv(temp_name, header=True)
-    temp_files = glob.glob(f'{temp_name}/part-*.csv')
-    if temp_files:
-        os.rename(temp_files[0], final_name)
-        os.system(f'rm -rf {temp_name}')
+    # Convert to Pandas and write to local filesystem
+    pandas_df = df.toPandas()
+    pandas_df.to_csv(final_name, index=False)
+    print(f"✓ Saved {final_name}")
 
 
 def generate_statistics(cluster_summary_df):
